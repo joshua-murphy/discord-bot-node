@@ -32,33 +32,37 @@ class Bot {
 
       this.getStreams();
     });
+    
+    bot.on('message', (message) => {
+      message.content === '!ping' && message.channel.send("I'm alive");
+    });
   };
 
   async getStreams() {
     const currentStreams = [];
     const streamChannel = bot.channels.cache.get('696765786542440540');
 
-    await client.helix.streams.getStreams({ game: Object.keys(this.games) }).then(({ data }) => {
-      data.forEach((stream) => {
-        const titleWords = stream.title.toLowerCase().match(/\b(\w+)\b/g);
+    const { data } = await client.helix.streams.getStreams({ game: Object.keys(this.games) });
 
-        if (stream.type === 'live' && titleWords.filter(value => -1 !== this.whitelist.indexOf(value)).length) {
-          // found a stream that looks like a speedrun
-          currentStreams.push(stream);
-        }
-      });
+    data.forEach((stream) => {
+      const titleWords = stream.title.toLowerCase().match(/\b(\w+)\b/g);
 
-      this.activeStreams = currentStreams.map((stream) => {
-        if (!this.activeStreams.find((id) => stream.id === id )) {
-          // new stream, post message in server
-          streamChannel.send(`${stream.userDisplayName} is streaming ${this.games[stream.gameId]}: \`${stream.title}\`\nhttps://twitch.tv/${stream.userDisplayName.toLowerCase()}`);
-        }
-
-        stream.id;
-      });
-
-      console.log(`active: ${this.activeStreams} \ncurrent: ${currentStreams}\n`);
+      if (titleWords && stream.type === 'live' && titleWords.filter(value => -1 !== this.whitelist.indexOf(value)).length) {
+        // found a stream that looks like a speedrun
+        currentStreams.push(stream);
+      }
     });
+
+    this.activeStreams = currentStreams.map((stream) => {
+      if (!this.activeStreams.find((id) => stream.id === id )) {
+        // new stream, post message in server
+        streamChannel.send(`${stream.userDisplayName} is streaming ${this.games[stream.gameId]}: \`${stream.title}\`\nhttps://twitch.tv/${stream.userDisplayName.toLowerCase()}`);
+      }
+
+      stream.id;
+    });
+
+    currentStreams.length && console.log(`active: ${this.activeStreams} \ncurrent: ${currentStreams}\n`);
   }
 }
 
