@@ -16,7 +16,7 @@ class Bot {
     bot.login(ENV.LOGIN_TOKEN);
 
     bot.on('ready', () => {
-      console.log(`Logged in!`);
+      console.log(`Logged in as ${bot.user.tag}!`);
 
       setInterval(() => {
         this.getStreams();
@@ -46,18 +46,18 @@ class Bot {
     });
 
     this.activeStreams = currentStreams.map((stream) => {
-      if (!this.activeStreams.find((id) => stream.id === id )) {
+      if (!this.activeStreams.find((id) => stream.id === id)) {
         // new stream, post message in server
         const embed = new MessageEmbed();
+        embed.setTitle(`${stream.userDisplayName} is live on Twitch: ${stream.title}`).setColor(0x6441A4).setDescription(`https://twitch.tv/${stream.userDisplayName.toLowerCase()}`);
 
-        embed.setTitle('Cannibalx6 is live on Twitch: TLC Any% runs').setColor(0x6441A4).setDescription('https://twitch.tv/${}');
         streamChannel.send(embed);
       }
 
-      stream.id;
+      return stream.id;
     });
 
-    currentStreams.length && console.log(`active: ${this.activeStreams} \ncurrent: ${currentStreams}\n`);
+    currentStreams.length && console.log(`active: ${JSON.stringify(this.activeStreams)} \ncurrent: ${JSON.stringify(currentStreams)}\n`);
   }
 }
 
