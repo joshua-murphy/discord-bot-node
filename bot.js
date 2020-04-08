@@ -1,11 +1,11 @@
-const Discord = require('discord.js');
+const { Client, MessageEmbed } = require('discord.js');
 const TwitchClient = require('twitch').default;
 const ENV = require('dotenv').config().parsed;
 
 const { games, whitelist } = require('./exports.js');
 
 const client = TwitchClient.withCredentials(ENV.CLIENT_ID, ENV.SECRET_KEY);
-const bot = new Discord.Client();
+const bot = new Client();
 
 class Bot {
   constructor() {
@@ -16,7 +16,7 @@ class Bot {
     bot.login(ENV.LOGIN_TOKEN);
 
     bot.on('ready', () => {
-      console.log(`Logged in as ${bot.user.tag}!`);
+      console.log(`Logged in!`);
 
       setInterval(() => {
         this.getStreams();
@@ -48,7 +48,10 @@ class Bot {
     this.activeStreams = currentStreams.map((stream) => {
       if (!this.activeStreams.find((id) => stream.id === id )) {
         // new stream, post message in server
-        streamChannel.send(`${stream.userDisplayName} is streaming ${this.games[stream.gameId]}: \`${stream.title}\`\nhttps://twitch.tv/${stream.userDisplayName.toLowerCase()}`);
+        const embed = new MessageEmbed();
+
+        embed.setTitle('Cannibalx6 is live on Twitch: TLC Any% runs').setColor(0x6441A4).setDescription('https://twitch.tv/${}');
+        streamChannel.send(embed);
       }
 
       stream.id;
