@@ -50,7 +50,7 @@ class Bot {
       if (!this.activeStreams.find((id) => stream.id === id)) {
         // new stream, post message in server
         const embed = new MessageEmbed();
-        embed.setTitle(`${stream.userDisplayName} is streaming ${games[stream.game_id]} on Twitch: ${stream.title}`).setColor(0x6441A4).setDescription(`https://twitch.tv/${stream.userDisplayName.toLowerCase()}`);
+        embed.setTitle(`${stream.userDisplayName} is streaming ${games[stream.gameId]}: ${stream.title}`).setColor(0x6441A4).setDescription(`https://twitch.tv/${stream.userDisplayName.toLowerCase()}`);
 
         currentStreams.length && console.log(`active: ${JSON.stringify(this.activeStreams)} \ncurrent: ${JSON.stringify(currentStreams)}\n`);
         postMessage && streamChannel.send(embed);
