@@ -10,11 +10,15 @@ exports.whitelist = [
   'any%',
   '100%',
   'hundo',
+  'all silver quests',
   'asq',
-  'aq',
+  'all quests',
   'speedrun',
   'speedruns',
-  'pb',
+  'personal best',
+  'pb attempts',
+  'world record',
+  'wr attempts',
   'routing'
 ]
 

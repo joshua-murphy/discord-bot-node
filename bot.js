@@ -16,10 +16,10 @@ class Bot {
     bot.login(ENV.LOGIN_TOKEN);
 
     bot.on('ready', () => {
-      console.log(`Logged in as ${bot.user.tag}!`);
+      console.log(`Logged in`);
 
       setInterval(() => {
-        this.getStreams();
+        this.getStreams(true);
       }, 60 * 1000);
 
       this.getStreams();
@@ -30,16 +30,17 @@ class Bot {
     });
   };
 
-  async getStreams() {
+  async getStreams(postMessage = false) {
     const currentStreams = [];
     const streamChannel = bot.channels.cache.get('696765786542440540');
 
     const { data } = await client.helix.streams.getStreams({ game: Object.keys(games) });
 
     data.forEach((stream) => {
-      const titleWords = stream.title.toLowerCase().match(/\b(\w|\%)+/g);
+      const title = stream.title.toLowerCase();
+      const validStream = whitelist.filter((term) => title.includes(term)).length > 0;
 
-      if (titleWords && stream.type === 'live' && titleWords.filter(value => -1 !== whitelist.indexOf(value)).length) {
+      if (validStream && stream.type === 'live') {
         // found a stream that looks like a speedrun
         currentStreams.push(stream);
       }
@@ -49,15 +50,14 @@ class Bot {
       if (!this.activeStreams.find((id) => stream.id === id)) {
         // new stream, post message in server
         const embed = new MessageEmbed();
-        embed.setTitle(`${stream.userDisplayName} is live on Twitch: ${stream.title}`).setColor(0x6441A4).setDescription(`https://twitch.tv/${stream.userDisplayName.toLowerCase()}`);
+        embed.setTitle(`${stream.userDisplayName} is streaming ${games[stream.game_id]} on Twitch: ${stream.title}`).setColor(0x6441A4).setDescription(`https://twitch.tv/${stream.userDisplayName.toLowerCase()}`);
 
-        streamChannel.send(embed);
+        currentStreams.length && console.log(`active: ${JSON.stringify(this.activeStreams)} \ncurrent: ${JSON.stringify(currentStreams)}\n`);
+        postMessage && streamChannel.send(embed);
       }
 
       return stream.id;
     });
-
-    currentStreams.length && console.log(`active: ${JSON.stringify(this.activeStreams)} \ncurrent: ${JSON.stringify(currentStreams)}\n`);
   }
 }
 
