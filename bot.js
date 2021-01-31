@@ -27,7 +27,7 @@ class Bot {
 //      this.getStreams();
 
       setInterval(() => {
-	var d = new Date();
+        var d = new Date();
 
         d.getHours() == 12 && d.getMinutes() == 0 && this.getXp(); // run at noon
       }, 60 * 1000);
@@ -57,7 +57,7 @@ class Bot {
           for (const skill in res.skills) { 
             const difference = +res.skills[skill].xp - +previous.skills[skill].xp;
 
-            difference && (message += `\n${skill.toTitleCase()}: ${difference}${skill === 'overall' ? '\n' : null}`);
+            difference && (message += `\n${skill.toTitleCase()}: ${difference.toDelimited()}${skill === 'overall' ? '\n' : ''}`);
           }
 
           message.length && streamChannel.send(p.name + ' gained XP:```' + message + '```');
@@ -106,6 +106,25 @@ String.prototype.toTitleCase = function() {
   return this.replace(/\w\S*/g, function(txt) {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   })
+};
+
+String.prototype.toDelimited = function(delimiter) {
+  if (this && this.match(/(\d|\.|-)+/) && this.match(/(\d|\.|-)+/)[0] === this.toString()) {
+    var str = this.split('.');
+    if(str.length === 2) {
+      return str[0].replace(/\B(?=(\d{3})+(?!\d))/g, (delimiter || ',')) + '.' + str[str.length - 1];
+    } else if(str.length === 1) {
+      return this.replace(/\B(?=(\d{3})+(?!\d))/g, (delimiter || ','));
+    } else {
+      return this.toString();
+    }
+  } else {
+    return this.toString();
+  }
+};
+
+Number.prototype.toDelimited = function(delimiter) {
+  return this.toString().toDelimited(delimiter);
 };
 
 const discordBot = new Bot;
