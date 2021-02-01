@@ -32,7 +32,7 @@ class Bot {
         d.getHours() == 12 && d.getMinutes() == 0 && this.getXp(); // run at noon
       }, 60 * 1000);
 
-      this.getXp();
+      //this.getXp();
     });
     
     bot.on('message', (message) => {
@@ -46,24 +46,31 @@ class Bot {
     const streamChannel = bot.channels.cache.get('696765786542440540');
 
     fileData.players.forEach(p => {
-      let { data } = p;
+      let { data: previous } = p;
 
       hiscores.getPlayer(p.name, p.gamemode || 'main').then((res) => {
-        const previous = p.data[p.data.length - 1]
+        const { skills } = res;
 
         if (previous) {
           let message = '';
 
-          for (const skill in res.skills) { 
-            const difference = +res.skills[skill].xp - +previous.skills[skill].xp;
+          for (const skill in skills) { 
+            const difference = +skills[skill].xp - +previous.skills[skill].xp;
+            let line;
 
-            difference && (message += `\n${skill.toTitleCase()}: ${difference.toDelimited()}${skill === 'overall' ? '\n' : ''}`);
+            if (skill === 'overall') {
+              line = `\nTotal: ${difference.toDelimited()} | Rank: ${(+skills[skill].rank - +previous.skills[skill].rank).toDelimited()}\n`;
+            } else {
+              line = `\n${skill.toTitleCase()}: ${difference.toDelimited()}`;
+            }
+
+            difference && (message += line); 
           }
 
           message.length && streamChannel.send(p.name + ' gained XP:```' + message + '```');
         }
 
-        p.data.push(res);
+        p.data = res;
         fs.writeFileSync('data.json', JSON.stringify(fileData, null, 2));
       }); 
     }); 
