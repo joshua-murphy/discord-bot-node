@@ -59,7 +59,7 @@ class Bot {
             let line;
 
             if (skill === 'overall') {
-              line = `\nTotal: ${difference.toDelimited()} | Rank: ${(+skills[skill].rank - +previous.skills[skill].rank).toDelimited()}\n`;
+              line = `\nTotal XP: ${difference.toDelimited()} | Ranks Gained: ${(+previous.skills[skill].rank - +skills[skill].rank).toDelimited()}\n`;
             } else {
               line = `\n${skill.toTitleCase()}: ${difference.toDelimited()}`;
             }
