@@ -56,13 +56,17 @@ class Bot {
 
           for (const skill in skills) { 
             const difference = +skills[skill].xp - +previous.skills[skill].xp;
+            const levelDifference = +skills[skill].level - +previous.skills[skill].level;
             let line;
 
             if (skill === 'overall') {
-              line = `\nTotal XP: ${difference.toDelimited()} | Ranks Gained: ${(+previous.skills[skill].rank - +skills[skill].rank).toDelimited()}\n`;
+              line = `\nTotal XP: ${difference.toDelimited()}`;
             } else {
               line = `\n${skill.toTitleCase()}: ${difference.toDelimited()}`;
             }
+
+            levelDifference && (line += ` | Levels Gained: ${levelDifference.toDelimited()}`);
+            skill === 'overall' && (line += `\n`);
 
             difference && (message += line); 
           }
